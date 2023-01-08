@@ -223,6 +223,8 @@ class DataLoader(Generic[T_co]):
             # \\
     ):
         # // Modified: additional parameters for the parallel fetching implementation
+        assert fetch_impl == "vanilla" or not persistent_workers, \
+            "threaded/asyncio implementations are buggy (exceptions after every epoch) with persistent workers"
         self.num_fetch_workers = num_fetch_workers
         self.batch_pool = batch_pool
         self.fetch_impl = fetch_impl
@@ -1533,10 +1535,6 @@ class _MultiProcessingDataLoaderIter(_BaseDataLoaderIter):
                 for q in self._index_queues:
                     q.cancel_join_thread()
                     q.close()
-            # TODO this was added by me to suppress shutdown erros
-            except AssertionError as ex:
-                if str(ex) != "can only join a child process":
-                    raise ex
             finally:
                 # Even though all this function does is putting into queues that
                 # we have called `cancel_join_thread` on, weird things can
@@ -1552,17 +1550,12 @@ class _MultiProcessingDataLoaderIter(_BaseDataLoaderIter):
                     _utils.signal_handling._remove_worker_pids(id(self))
                     self._worker_pids_set = False
                 for w in self._workers:
-                    # TODO: this try except block was added by me to suppress shutdown errors
-                    try:
-                        if w.is_alive():
-                            # Existing mechanisms try to make the workers exit
-                            # peacefully, but in case that we unfortunately reach
-                            # here, which we shouldn't, (e.g., pytorch/pytorch#39570),
-                            # we kill the worker.
-                            w.terminate()
-                    except AssertionError as e:
-                        if str(e) != "can only test a child process":
-                            raise e
+                    if w.is_alive():
+                        # Existing mechanisms try to make the workers exit
+                        # peacefully, but in case that we unfortunately reach
+                        # here, which we shouldn't, (e.g., pytorch/pytorch#39570),
+                        # we kill the worker.
+                        w.terminate()
 
     def __del__(self):
         self._shutdown_workers()
