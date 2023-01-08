@@ -20,10 +20,10 @@ print(f"inserting version into setup.cfg after line {metadata_line}")
 lines.insert(metadata_line + 1, f"version = {get_tagname()}")
 
 # for unified access to the version number across python versions
-print("inserting version into kappadata/__init__.py")
-with open("kappadata/__init__.py", "r") as f:
+print("inserting version into pytorch_concurrent_dataloader/__init__.py")
+with open("pytorch_concurrent_dataloader/__init__.py", "r") as f:
     content = f.read()
-with open("kappadata/__init__.py", "w") as f:
+with open("pytorch_concurrent_dataloader/__init__.py", "w") as f:
     f.write(f"__version__ = \"{get_tagname()}\"\n\n" + content)
 
 with open("setup.cfg", "w") as f:
