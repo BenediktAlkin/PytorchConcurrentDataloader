@@ -12,7 +12,6 @@ import time
 from dataclasses import dataclass
 from typing import Union
 
-from .dataloader import _DatasetKind
 import torch.cuda
 from torch._utils import ExceptionWrapper
 from torch.utils.data._utils import HAS_NUMPY
@@ -270,6 +269,7 @@ def _worker_loop(
         global _worker_info
         _worker_info = WorkerInfo(id=worker_id, num_workers=num_workers, seed=seed, dataset=dataset)
 
+        from .dataloader import _DatasetKind
 
         init_exception = None
 
