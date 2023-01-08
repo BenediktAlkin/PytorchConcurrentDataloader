@@ -402,6 +402,7 @@ def _worker_loop(
         data_queue.cancel_join_thread()
         # at the end of dataloading this would crash with:
         # "assert self._parent_pid == os.getpid(), 'can only test a child process'"
+        # TODO: this try except block was added by me
         try:
             data_queue.close()
         except AssertionError as e:

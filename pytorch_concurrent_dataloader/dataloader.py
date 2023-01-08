@@ -1548,6 +1548,7 @@ class _MultiProcessingDataLoaderIter(_BaseDataLoaderIter):
                     _utils.signal_handling._remove_worker_pids(id(self))
                     self._worker_pids_set = False
                 for w in self._workers:
+                    # TODO: this try except block was added by me
                     try:
                         if w.is_alive():
                             # Existing mechanisms try to make the workers exit
