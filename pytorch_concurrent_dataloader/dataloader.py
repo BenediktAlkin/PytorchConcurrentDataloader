@@ -1533,6 +1533,10 @@ class _MultiProcessingDataLoaderIter(_BaseDataLoaderIter):
                 for q in self._index_queues:
                     q.cancel_join_thread()
                     q.close()
+            # TODO this was added by me to suppress shutdown erros
+            except AssertionError as ex:
+                if str(ex) != "can only join a child process":
+                    raise ex
             finally:
                 # Even though all this function does is putting into queues that
                 # we have called `cancel_join_thread` on, weird things can
@@ -1548,7 +1552,7 @@ class _MultiProcessingDataLoaderIter(_BaseDataLoaderIter):
                     _utils.signal_handling._remove_worker_pids(id(self))
                     self._worker_pids_set = False
                 for w in self._workers:
-                    # TODO: this try except block was added by me
+                    # TODO: this try except block was added by me to suppress shutdown errors
                     try:
                         if w.is_alive():
                             # Existing mechanisms try to make the workers exit
