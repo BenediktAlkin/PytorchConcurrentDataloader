@@ -1,0 +1,42 @@
+name: publish
+
+on:
+  push:
+    tags:
+      - "v*"
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: setup python
+        uses: actions/setup-python@v2
+        with:
+          python-version: 3.8
+
+      # prepare version update
+      - name: extract tag
+        uses: olegtarasov/get-tag@v2.1
+        id: get_tag
+      # update versions locally
+      - name: update application version
+        run: python .github/scripts/update_version.py --tagname ${{ steps.get_tag.outputs.tag }}
+
+      # install build tools
+      - name: install build tools
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install --upgrade build
+          python -m pip install --upgrade twine
+      # build
+      - name: build
+        run: python -m build
+
+      # publish
+      - name: publish to prod
+        uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          password: ${{ secrets.PYPI_API_TOKEN }}
