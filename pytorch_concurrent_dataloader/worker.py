@@ -400,4 +400,9 @@ def _worker_loop(
         pass
     if done_event.is_set():
         data_queue.cancel_join_thread()
-        data_queue.close()
+        # at the end of dataloading this would crash with:
+        # "assert self._parent_pid == os.getpid(), 'can only test a child process'"
+        try:
+            data_queue.close()
+        except:
+            pass
