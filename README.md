@@ -1,5 +1,8 @@
 # PytorchConcurrentDataloader
 
+[![publish](https://github.com/BenediktAlkin/PytorchConcurrentDataloader/actions/workflows/publish.yaml/badge.svg)](https://github.com/BenediktAlkin/PytorchConcurrentDataloader/actions/workflows/publish.yaml)
+
+
 Minimal version of the [ConcurrentDataloader repository](https://github.com/iarai/concurrent-dataloader) published to pip.
 
 #### Setup
