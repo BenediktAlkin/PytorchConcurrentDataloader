@@ -404,5 +404,6 @@ def _worker_loop(
         # "assert self._parent_pid == os.getpid(), 'can only test a child process'"
         try:
             data_queue.close()
-        except:
-            pass
+        except AssertionError as e:
+            if str(e) != "can only test a child process":
+                raise e

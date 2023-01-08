@@ -1548,12 +1548,16 @@ class _MultiProcessingDataLoaderIter(_BaseDataLoaderIter):
                     _utils.signal_handling._remove_worker_pids(id(self))
                     self._worker_pids_set = False
                 for w in self._workers:
-                    if w.is_alive():
-                        # Existing mechanisms try to make the workers exit
-                        # peacefully, but in case that we unfortunately reach
-                        # here, which we shouldn't, (e.g., pytorch/pytorch#39570),
-                        # we kill the worker.
-                        w.terminate()
+                    try:
+                        if w.is_alive():
+                            # Existing mechanisms try to make the workers exit
+                            # peacefully, but in case that we unfortunately reach
+                            # here, which we shouldn't, (e.g., pytorch/pytorch#39570),
+                            # we kill the worker.
+                            w.terminate()
+                    except AssertionError as e:
+                        if str(e) != "can only test a child process":
+                            raise e
 
     def __del__(self):
         self._shutdown_workers()
